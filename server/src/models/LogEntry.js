@@ -36,7 +36,7 @@ const logEntrySchema = new Schema({
         required: true,
     }
 }, {
-    timestamp: true,
+    timestamps: true,
 });
 
 // we create the actual model of mongoose so we can call 

@@ -13,8 +13,14 @@ const logs = require('./api/logs');
 const app = express();
 
 mongoose.connect(process.env.DATABASE_URL, {
-    userNewUrlParser: true,
+    useNewUrlParser: true,
     useUnifiedTopology: true,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+    console.log('We are connected!');
 });
 
 app.use(morgan('common'));
@@ -22,7 +28,7 @@ app.use(helmet());
 app.use(cors({
     origin: process.env.CORS_ORIGIN, //only this addess will be listen to request
 }));
-app.use(express.json());
+app.use(express.json()); //body parser for json
 
 app.get('/', (req, res) => {{
     res.json({
