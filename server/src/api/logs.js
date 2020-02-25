@@ -58,4 +58,20 @@ router.post('/', async (req, res, next) =>{
     }
 });
 
+router.delete('/:id', async (req, res) => {
+
+    try{
+        LogEntry.findByIdAndRemove(req.params.id, (err, log) => {
+
+            if(err){
+                return next(err);
+            }
+            res.send('Product deleted');
+        });
+    }
+    catch(error){
+
+    }
+});
+
 module.exports = router;
