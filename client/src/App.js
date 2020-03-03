@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import ReactMapGL, { Marker, Popup } from 'react-map-gl';
 
 import { listLogEntries } from './API';
@@ -18,13 +18,13 @@ const App = () =>{
   const [ showPopup, setShowPopup ] = useState({});
   const [ addEntryLocation, setAddEntryLocation ] = useState(null);
 
+  const getEntries = async () => {
+    const list = await listLogEntries(); 
+    setLogList(list);
+  }
+
   useEffect(() => {
-    const getLogList = async () => { 
-      const list = await listLogEntries(); 
-      setLogList(list);
-      console.log(list);
-    }
-    getLogList();
+    getEntries();
   }, []);
 
   const showAddMarkerPopup = (event) => {
@@ -45,9 +45,8 @@ const App = () =>{
     >
       {
         logList.map( entry => (
-          <>
+          <Fragment key={entry._id}>
           <Marker 
-            key={entry._id}
             latitude={entry.latitude} 
             longitude={entry.longitude} 
             offsetLeft={-12}
@@ -87,12 +86,13 @@ const App = () =>{
                 <div className="popup">
                   <h3>{entry.title}</h3>
                   <p>{entry.comments}</p>
-                  <small>{new Date(entry.visitDate).toLocaleDateString}</small>
+                  <small>Visited on: {new Date(entry.visitDate).toLocaleDateString()}</small>
+                  {entry.image ? <img src={entry.image} alt={entry.title}/> : null}
                 </div>
               </Popup>
             ) : null
           }
-          </>
+          </Fragment>
         ))
       }
       {
@@ -130,7 +130,13 @@ const App = () =>{
               anchor="top"
             >
               <div className="popup">
-                <LogEntryForm />
+                <LogEntryForm 
+                  location={addEntryLocation}
+                  onClose={ () => { 
+                    setAddEntryLocation(null);
+                    getEntries();
+                  }}
+                />
               </div>
             </Popup>
           </>
